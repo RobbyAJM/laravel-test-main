@@ -25,9 +25,8 @@ class BooksController extends Controller
 
         $baseQuery = Book::with(['authors', 'reviews']);
 
-        $query = (clone $baseQuery)->offset($option['per_page'] * ($option['page'] - 1))->limit($option['per_page']);
+        $query = (clone $baseQuery);
 
-        
         if ($request->sortColumn && $request->sortDirection) {
             $query->orderBy($request->sortColumn, $request->sortDirection);
         }
@@ -35,35 +34,14 @@ class BooksController extends Controller
         if ($option['title']) {
             $query->where('title', 'like', '%' . $option['title'] . '%');
         }
-
+        
         if (count($option['authors'])) {
             $query->whereHas('authors', function ($query) use ($option) {
                 $query->whereIn('id', $option['authors']);
             });
         }
 
-        $count = $query->count();
-        $total_page = ceil($count / $option['per_page']);
-        
-        $query = $query->get();
-        
-        return BookResource::collection($query)->additional([
-            'links' => [
-                'first'     => route('books.index', ['page' => 1]),
-                'last'      => route('books.index', ['page' => $total_page]),
-                'prev'      => $option['page'] <= 1 ? null : route('books.index', ['page' => $option['page'] - 1]),
-                'next'      => $option['page'] >= $total_page ? null : route('books.index', ['page' => $option['page'] + 1]),
-            ],
-            'meta' => [
-                'per_page'      => $option['per_page'],
-                'current_page'  => $option['page'],
-                'last_page'     => $total_page,
-                'from'          => $option['per_page'] * ($option['page'] - 1) + 1,
-                'to'            => $option['per_page'] * ($option['page'] - 1) + $count,
-                'total'         => $count,
-                'path'          => route('books.index'),
-            ]
-        ]);
+        return BookResource::collection($query->paginate($option['per_page']));
     }
 
     public function store(PostBookRequest $request)
