@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\BookReview;
-use App\Http\Requests\PostBookReviewRequest;
-use App\Http\Resources\BookReviewResource;
+use App\Book;
 use Illuminate\Http\Request;
+use App\Http\Resources\BookReviewResource;
+use App\Http\Requests\PostBookReviewRequest;
 
 class BooksReviewController extends Controller
 {
@@ -16,14 +16,21 @@ class BooksReviewController extends Controller
 
     public function store(int $bookId, PostBookReviewRequest $request)
     {
-        // @TODO implement
-        $bookReview = new BookReview();
+        $book = Book::findOrFail($bookId);
+        $bookReview = $book->reviews()->create([
+            'user_id' => auth()->id(),
+            'review' => $request->review,
+            'comment' => $request->comment,
+        ]);
 
         return new BookReviewResource($bookReview);
     }
 
     public function destroy(int $bookId, int $reviewId, Request $request)
     {
-        // @TODO implement
+        $book = Book::findOrFail($bookId);
+        $bookReview = $book->reviews()->findOrFail($reviewId);
+        $bookReview->delete();
+        return response()->json([], 204);
     }
 }
