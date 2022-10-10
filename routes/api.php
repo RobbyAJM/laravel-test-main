@@ -14,8 +14,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::get('/books', 'BooksController@index')->name('books.index');
 Route::middleware('auth.basic')->group(function () {
-    Route::get('/books', 'BooksController@index')->name('books.index');
     Route::post('/books/{id}/reviews', 'BooksReviewController@store');
     Route::delete('/books/{bookId}/reviews/{reviewId}', 'BooksReviewController@destroy');
     Route::middleware('auth.admin')->group(function () {
