@@ -22,8 +22,8 @@ class BookResource extends JsonResource
             'published_year'    => (int) $this->published_year,
             'authors'           => $this->authors->pick('id', 'name', 'surname'),
             'review'            => [
-                'avg'               => (int) $this->reviews->count(),
-                'count'             => (float) $this->reviews->average('review'),
+                'avg'               => (int) round($this->reviews->count()),
+                'count'             => (int) $this->reviews->average('review'),
             ]
         ];
     }

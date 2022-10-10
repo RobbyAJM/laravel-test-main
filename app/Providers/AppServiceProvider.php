@@ -24,6 +24,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        // Custom collection macro to pick multiple keys from a collection
         Collection::macro('pick', function (... $columns) {
             return $this->map(function ($item, $key) use ($columns) {
                 $data = [];

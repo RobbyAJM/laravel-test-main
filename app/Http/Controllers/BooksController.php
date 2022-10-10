@@ -46,8 +46,13 @@ class BooksController extends Controller
 
     public function store(PostBookRequest $request)
     {
-        // @TODO implement
-        $book = new Book();
+        // Re-validate request only for 'isbn' field
+        $request->validate([
+            'isbn' => 'digits:13|',
+        ]);
+        
+        $book = Book::create($request->all());
+        $book->authors()->attach($request->authors);
 
         return new BookResource($book);
     }
